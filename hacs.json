@@ -1,0 +1,6 @@
+{
+  "name": "ATV Media Remote",
+  "render_readme": true,
+  "type": "plugin",
+  "filename": "atv-media-remote.js"
+}
