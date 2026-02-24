@@ -26,6 +26,7 @@ class AtvMediaRemote extends HTMLElement {
 
   setConfig(config) {
     if (!config.entities || config.entities.length === 0) throw new Error("Please define entities");
+    const prevStartup = this._config?.startup_mode;
     this._config = {
       accent_color: '#007AFF',
       volume_accent: '#007AFF',
@@ -38,6 +39,27 @@ class AtvMediaRemote extends HTMLElement {
       ...config
     };
     if (!this._entity) this._entity = this._config.entities[0];
+    // If startup_mode changed via the editor and the card is already rendered, apply immediately
+    if (prevStartup !== undefined && prevStartup !== this._config.startup_mode && this.shadowRoot.innerHTML) {
+      this._applyStartupMode();
+    }
+  }
+
+  _applyStartupMode() {
+    const cardOuter = this.shadowRoot.getElementById('cardOuter');
+    if (!cardOuter) return;
+    const mode = this._config.startup_mode || 'compact';
+    // Always reset to a clean maximised state first
+    cardOuter.classList.remove('mode-compact');
+    if (this._remoteMode) {
+      this._toggleRemote(); // exits remote mode cleanly
+    }
+    if (mode === 'compact') {
+      cardOuter.classList.add('mode-compact');
+    } else if (mode === 'remote') {
+      requestAnimationFrame(() => this._toggleRemote());
+    }
+    // 'maximised' needs nothing — already the state after the reset above
   }
 
   set hass(hass) {
@@ -45,16 +67,7 @@ class AtvMediaRemote extends HTMLElement {
     if (!this.shadowRoot.innerHTML) {
       this.render();
       this.setupListeners();
-      // Apply startup mode
-      const mode = this._config.startup_mode || 'compact';
-      const cardOuter = this.shadowRoot.getElementById('cardOuter');
-      if (mode === 'compact') {
-        cardOuter.classList.add('mode-compact');
-      } else if (mode === 'remote') {
-        // Start expanded then enter remote view
-        requestAnimationFrame(() => this._toggleRemote());
-      }
-      // 'maximised' is the default render state — no class needed
+      this._applyStartupMode();
     }
 
     if (this._config.auto_switch) {
@@ -78,6 +91,9 @@ class AtvMediaRemote extends HTMLElement {
         this._hass.callService('homeassistant', 'update_entity', { entity_id: this._entity }).catch(() => {});
       }
     }, 10000);
+    // Re-apply startup mode every time the element is connected to the DOM
+    // (fires on page load, navigation back to the page, and app reopen)
+    requestAnimationFrame(() => this._applyStartupMode());
   }
 
   disconnectedCallback() {
