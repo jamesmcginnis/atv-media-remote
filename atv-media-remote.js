@@ -21,7 +21,7 @@ class AtvMediaRemote extends HTMLElement {
   }
 
   static getStubConfig() {
-    return { entities: [], auto_switch: true, accent_color: '#007AFF', volume_accent: '#007AFF', title_color: '#ffffff', artist_color: '#ffffff', show_entity_selector: true };
+    return { entities: [], auto_switch: true, accent_color: '#007AFF', volume_accent: '#007AFF', title_color: '#ffffff', artist_color: '#ffffff', show_entity_selector: true, volume_control: 'slider' };
   }
 
   setConfig(config) {
@@ -33,6 +33,7 @@ class AtvMediaRemote extends HTMLElement {
       artist_color: '#ffffff',
       auto_switch: true,
       show_entity_selector: true,
+      volume_control: 'slider',
       ...config
     };
     if (!this._entity) this._entity = this._config.entities[0];
@@ -187,6 +188,33 @@ class AtvMediaRemote extends HTMLElement {
         .volume-slider { width: 100%; height: 5px; accent-color: var(--vol-accent); margin-top: 10px; }
         .vol-section { display: contents; }
         .vol-icon { display: none; width: 18px; height: 18px; fill: rgba(255,255,255,0.5); cursor: pointer; }
+
+        /* Volume +/- buttons — hidden unless vol-btn-mode is active */
+        .vol-btn {
+          display: none;
+          cursor: pointer;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+          padding: 0;
+          background: none;
+          border: none !important;
+          border-radius: 50% !important;
+        }
+        .vol-btn svg { width: 24px; height: 24px; fill: rgba(255,255,255,0.5); }
+        .vol-btn:active, .vol-btn.pressed { transform: scale(0.92); background: rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        .vol-btn:active svg, .vol-btn.pressed svg { fill: #fff; filter: drop-shadow(0 0 8px rgba(255,255,255,0.8)); }
+
+        /* Expanded vol-btn-mode: show vol buttons, hide slider, centre controls */
+        .vol-btn-mode .vol-btn { display: flex; }
+        .vol-btn-mode .vol-section { display: none; }
+        .vol-btn-mode .controls { justify-content: center; }
+        /* Compact vol-btn-mode: centre controls, hide slider */
+        .mode-compact.vol-btn-mode .controls { justify-content: center; padding-right: 0; gap: 10px; }
+        .mode-compact.vol-btn-mode .vol-section { display: none; }
+        .mode-compact.vol-btn-mode .vol-btn { display: flex; }
+        .mode-compact.vol-btn-mode .vol-btn svg { width: 20px; height: 20px; }
         .selector { width: 100%; padding: 10px; background: rgba(58,58,60,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; margin-top: 15px; font-size: 13px; cursor: pointer; text-align: center; text-align-last: center; }
         .selector.hidden { display: none !important; }
         .selector-hidden .content { padding-bottom: 12px; }
@@ -449,13 +477,19 @@ class AtvMediaRemote extends HTMLElement {
           <div class="progress-bar" id="progWrap"><div class="progress-fill" id="progFill"></div></div>
           <div class="progress-times"><span id="pCur">0:00</span><span id="pTot">0:00</span></div>
           <div class="controls">
+            <button class="mini-remote-btn" id="miniRemoteBtn">
+              <svg viewBox="0 0 24 24"><path d="M17 5H7a5 5 0 0 0-5 5v4a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5v-4a5 5 0 0 0-5-5zm-8 9H7v-2h2v2zm0-4H7V8h2v2zm4 6h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V6h2v2zm4 8h-2v-6h2v6z"/></svg>
+            </button>
+            <button class="vol-btn" id="btnVolDown">
+              <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+            </button>
             <button class="extra-btn" id="btnShuffle"><svg viewBox="0 0 24 24"><path d="M14.83,13.41L13.42,14.82L16.55,17.95L14.5,20H20V14.5L17.96,16.54L14.83,13.41M14.5,4H20V9.5L17.96,7.46L5.41,20L4,18.59L16.54,6.04L14.5,4M10.59,9.17L5.41,4L4,5.41L9.17,10.58L10.59,9.17Z"/></svg></button>
             <button class="nav-btn" id="btnPrev"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
             <button class="play-btn" id="btnPlay"><svg viewBox="0 0 24 24" id="playIcon"></svg></button>
             <button class="nav-btn" id="btnNext"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
             <button class="extra-btn" id="btnRepeat"><svg viewBox="0 0 24 24" id="repeatIcon"></svg></button>
-            <button class="mini-remote-btn" id="miniRemoteBtn">
-              <svg viewBox="0 0 24 24"><path d="M17 5H7a5 5 0 0 0-5 5v4a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5v-4a5 5 0 0 0-5-5zm-8 9H7v-2h2v2zm0-4H7V8h2v2zm4 6h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V6h2v2zm4 8h-2v-6h2v6z"/></svg>
+            <button class="vol-btn" id="btnVolUp">
+              <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
             </button>
             <div class="vol-section">
               <svg class="vol-icon" id="volMuteBtn" viewBox="0 0 24 24"></svg>
@@ -498,6 +532,26 @@ class AtvMediaRemote extends HTMLElement {
     };
 
     ['btnPlay','btnPrev','btnNext','btnShuffle','btnRepeat','modeBtn'].forEach(id => addPressEffect(r.getElementById(id)));
+
+    // ── Volume +/- button listeners (use same smart Apple TV detection as slider) ──
+    const sendVolCmd = (direction) => {
+      const remoteEntityId = this._entity.replace('media_player.', 'remote.');
+      const hasRemote = !!this._hass.states[remoteEntityId];
+      if (hasRemote) {
+        this._hass.callService('remote', 'send_command', {
+          entity_id: remoteEntityId,
+          command: direction > 0 ? 'volume_up' : 'volume_down'
+        }).catch(() => {});
+      } else {
+        const state = this._hass.states[this._entity];
+        const current = state?.attributes?.volume_level || 0;
+        this.call('volume_set', { volume_level: Math.min(1, Math.max(0, current + direction * 0.05)) });
+      }
+    };
+    r.getElementById('btnVolUp').onclick   = () => sendVolCmd(1);
+    r.getElementById('btnVolDown').onclick = () => sendVolCmd(-1);
+    addPressEffect(r.getElementById('btnVolUp'));
+    addPressEffect(r.getElementById('btnVolDown'));
 
     const slider = r.getElementById('vSlider');
 
@@ -626,6 +680,9 @@ class AtvMediaRemote extends HTMLElement {
     artistEl.textContent = state.attributes.media_artist || state.attributes.friendly_name || '';
     artistEl.style.color = this._config.artist_color || 'rgba(255,255,255,0.7)';
 
+    // Apply volume control mode
+    r.getElementById('cardOuter').classList.toggle('vol-btn-mode', this._config.volume_control === 'buttons');
+
     // Show or hide entity selector
     const cardOuter = r.getElementById('cardOuter');
     if (this._config.show_entity_selector === false) {
@@ -738,6 +795,8 @@ class AtvMediaRemoteEditor extends HTMLElement {
     if (autoSwitchInput) autoSwitchInput.checked = this._config.auto_switch !== false;
     const showSelectorInput = root.getElementById('show_entity_selector');
     if (showSelectorInput) showSelectorInput.checked = this._config.show_entity_selector !== false;
+    const volBtnInput = root.getElementById('volume_control_btn');
+    if (volBtnInput) volBtnInput.checked = this._config.volume_control === 'buttons';
   }
 
   render() {
@@ -798,6 +857,12 @@ class AtvMediaRemoteEditor extends HTMLElement {
           </div>
         </div>
         <div class="row">
+          <div class="toggle-row">
+            <label>Use Volume Buttons (instead of slider)</label>
+            <input type="checkbox" id="volume_control_btn">
+          </div>
+        </div>
+        <div class="row">
           <label>Manage & Reorder Media Players</label>
           <input type="text" id="search" placeholder="Filter entities...">
           <div class="checklist" id="entityList">
@@ -805,7 +870,7 @@ class AtvMediaRemoteEditor extends HTMLElement {
               const isSelected = selected.includes(ent);
               return `
                 <div class="check-item" data-id="${ent}" draggable="${isSelected}">
-                  <div class="drag-handle">☰</div>
+                  <div class="drag-handle"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:#888;display:block;"><path d="M9,3H11V5H9V3M13,3H15V5H13V3M9,7H11V9H9V7M13,7H15V9H13V7M9,11H11V13H9V11M13,11H15V13H13V11M9,15H11V17H9V15M13,15H15V17H13V15M9,19H11V21H9V19M13,19H15V21H13V21V19Z"/></svg></div>
                   <input type="checkbox" ${isSelected ? 'checked' : ''}>
                   <span style="margin-left: 10px; flex: 1;">${this._hass.states[ent]?.attributes?.friendly_name || ent}</span>
                 </div>
@@ -900,6 +965,7 @@ class AtvMediaRemoteEditor extends HTMLElement {
     root.getElementById('artist_color').oninput  = (e) => this._updateConfig('artist_color',  e.target.value);
     root.getElementById('auto_switch').onchange  = (e) => this._updateConfig('auto_switch',   e.target.checked);
     root.getElementById('show_entity_selector').onchange = (e) => this._updateConfig('show_entity_selector', e.target.checked);
+    root.getElementById('volume_control_btn').onchange   = (e) => this._updateConfig('volume_control', e.target.checked ? 'buttons' : 'slider');
   }
 
   _updateConfig(key, value) {
