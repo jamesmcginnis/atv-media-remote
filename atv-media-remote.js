@@ -239,16 +239,16 @@ class AtvMediaRemote extends HTMLElement {
         /* compact overrides */
         .mode-compact .art-wrapper { display: none; }
         .mode-compact .mini-art { display: flex; width: 44px; height: 44px; }
-        .mode-compact .content { padding: 10px; gap: 2px; }
+        .mode-compact .content { padding: 10px; display: flex; flex-direction: column; gap: 0; }
         .mode-compact .info-row { margin-bottom: 0; }
         .mode-compact .track-title { font-size: 14px; }
         .mode-compact .track-artist { font-size: 12px; margin-bottom: 0; }
-        .mode-compact .controls { margin: 6px 0 2px 0; gap: 8px; justify-content: flex-start; padding-right: 38px; }
+        .mode-compact .controls { margin: 6px 0 0 0; gap: 8px; justify-content: flex-start; padding-right: 38px; flex-wrap: wrap; }
         .mode-compact .play-btn svg { width: 28px; height: 28px; }
         .mode-compact .nav-btn svg { width: 19px; height: 19px; }
-        .mode-compact .vol-section { display: flex; align-items: center; flex: 1; margin-left: 6px; min-width: 0; }
+        .mode-compact .vol-section { display: flex; align-items: center; gap: 6px; width: 100%; padding: 4px 0 4px 0; min-width: 0; }
         .mode-compact .vol-icon { display: block; flex-shrink: 0; }
-        .mode-compact .volume-slider { margin-top: 0; flex: 1; margin-left: 5px; min-width: 40px; }
+        .mode-compact .volume-slider { margin-top: 0; flex: 1; min-width: 0; }
         .mode-compact .selector, .mode-compact .extra-btn, .mode-compact .progress-times { display: none; }
         .mode-compact .size-toggle { top: 8px; right: 8px; width: 28px; height: 28px; background: rgba(255,255,255,0.1); }
         .mode-compact .size-toggle svg { width: 14px; height: 14px; }
