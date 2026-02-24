@@ -21,7 +21,7 @@ class AtvMediaRemote extends HTMLElement {
   }
 
   static getStubConfig() {
-    return { entities: [], auto_switch: true, accent_color: '#007AFF', volume_accent: '#007AFF', title_color: '#ffffff', artist_color: '#ffffff', show_entity_selector: true, volume_control: 'slider' };
+    return { entities: [], auto_switch: true, accent_color: '#007AFF', volume_accent: '#007AFF', title_color: '#ffffff', artist_color: '#ffffff', show_entity_selector: true, volume_control: 'slider', startup_mode: 'compact' };
   }
 
   setConfig(config) {
@@ -34,6 +34,7 @@ class AtvMediaRemote extends HTMLElement {
       auto_switch: true,
       show_entity_selector: true,
       volume_control: 'slider',
+      startup_mode: 'compact',
       ...config
     };
     if (!this._entity) this._entity = this._config.entities[0];
@@ -44,6 +45,16 @@ class AtvMediaRemote extends HTMLElement {
     if (!this.shadowRoot.innerHTML) {
       this.render();
       this.setupListeners();
+      // Apply startup mode
+      const mode = this._config.startup_mode || 'compact';
+      const cardOuter = this.shadowRoot.getElementById('cardOuter');
+      if (mode === 'compact') {
+        cardOuter.classList.add('mode-compact');
+      } else if (mode === 'remote') {
+        // Start expanded then enter remote view
+        requestAnimationFrame(() => this._toggleRemote());
+      }
+      // 'maximised' is the default render state — no class needed
     }
 
     if (this._config.auto_switch) {
@@ -798,6 +809,8 @@ class AtvMediaRemoteEditor extends HTMLElement {
     if (showSelectorInput) showSelectorInput.checked = this._config.show_entity_selector !== false;
     const volBtnInput = root.getElementById('volume_control_btn');
     if (volBtnInput) volBtnInput.checked = this._config.volume_control === 'buttons';
+    const startupModeInput = root.getElementById('startup_mode');
+    if (startupModeInput) startupModeInput.value = this._config.startup_mode || 'compact';
   }
 
   render() {
@@ -861,6 +874,16 @@ class AtvMediaRemoteEditor extends HTMLElement {
           <div class="toggle-row">
             <label>Use Volume Buttons (instead of slider)</label>
             <input type="checkbox" id="volume_control_btn">
+          </div>
+        </div>
+        <div class="row">
+          <div class="toggle-row">
+            <label>Startup View</label>
+            <select id="startup_mode" style="background:var(--card-background-color);color:var(--primary-text-color);border:1px solid #444;border-radius:4px;padding:5px 8px;font-size:13px;cursor:pointer;">
+              <option value="compact">Compact</option>
+              <option value="maximised">Maximised</option>
+              <option value="remote">Remote Control</option>
+            </select>
           </div>
         </div>
         <div class="row">
@@ -967,6 +990,7 @@ class AtvMediaRemoteEditor extends HTMLElement {
     root.getElementById('auto_switch').onchange  = (e) => this._updateConfig('auto_switch',   e.target.checked);
     root.getElementById('show_entity_selector').onchange = (e) => this._updateConfig('show_entity_selector', e.target.checked);
     root.getElementById('volume_control_btn').onchange   = (e) => this._updateConfig('volume_control', e.target.checked ? 'buttons' : 'slider');
+    root.getElementById('startup_mode').onchange         = (e) => this._updateConfig('startup_mode', e.target.value);
   }
 
   _updateConfig(key, value) {
