@@ -1,5 +1,5 @@
 /**
- * ATV Media Remote 
+ * ATV Media Remote
  * Includes: Reordering, Mobile Support, Pressed Glow Effects, Connection Safety, and Remote Control.
  */
 
@@ -141,9 +141,6 @@ class AtvMediaRemote extends HTMLElement {
     } else {
       overlay.classList.add('hidden');
       remoteBtn.classList.remove('remote-btn-active');
-      // Close apps dropdown if open
-      const dd = r.getElementById('rAppsDropdown');
-      if (dd) { dd.classList.add('hidden'); r.getElementById('rApps')?.classList.remove('r-apps-open'); }
       // Restore art to whatever state it should be
       const state = this._hass?.states[this._entity];
       if (state) {
@@ -373,47 +370,6 @@ class AtvMediaRemote extends HTMLElement {
         .r-power-btn.r-power-on svg { fill: rgba(255,90,80,0.95); }
         .r-power-btn.r-power-on:active, .r-power-btn.r-power-on.pressed { background: rgba(255,59,48,0.28); box-shadow: 0 0 12px rgba(255,59,48,0.25); }
 
-        /* Apps button active state */
-        .r-apps-btn.r-apps-open { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.3) !important; }
-
-        /* ─── Apps dropdown ─── */
-        .r-apps-dropdown {
-          position: absolute;
-          top: 52px;
-          left: 16px;
-          right: 16px;
-          background: rgba(36,36,40,0.98);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255,255,255,0.14);
-          border-radius: 14px;
-          z-index: 10;
-          overflow: hidden;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.55);
-          max-height: 220px;
-          overflow-y: auto;
-        }
-        .r-apps-dropdown.hidden { display: none; }
-        .r-apps-dropdown::-webkit-scrollbar { width: 3px; }
-        .r-apps-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-        .r-app-item {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 11px 16px;
-          font-size: 14px;
-          color: rgba(255,255,255,0.88);
-          font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
-          cursor: pointer;
-          border-bottom: 1px solid rgba(255,255,255,0.06);
-          transition: background 0.1s ease;
-        }
-        .r-app-item:last-child { border-bottom: none; }
-        .r-app-item:active, .r-app-item:hover { background: rgba(255,255,255,0.08); }
-        .r-app-item svg { width: 16px; height: 16px; fill: rgba(255,255,255,0.45); flex-shrink: 0; }
-        .r-app-item.r-app-active { color: #007AFF; }
-        .r-app-item.r-app-active svg { fill: #007AFF; }
-
         /* ─── Clickpad — fills the available space now media row is removed ─── */
         .clickpad-wrap { display: flex; align-items: center; justify-content: center; width: 100%; flex: 1; }
         .clickpad {
@@ -496,7 +452,7 @@ class AtvMediaRemote extends HTMLElement {
           <div class="remote-overlay hidden" id="remoteOverlay">
             <div class="remote-panel">
 
-              <!-- Row 1: Back + Home + Apps + Power -->
+              <!-- Row 1: Back + Home -->
               <div class="r-top-row">
                 <button class="r-pill-btn" id="rMenu">
                   <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
@@ -506,18 +462,11 @@ class AtvMediaRemote extends HTMLElement {
                   <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
                   TV
                 </button>
-                <button class="r-pill-btn r-apps-btn" id="rApps">
-                  <svg viewBox="0 0 24 24"><path d="M4,4H10V10H4V4M14,4H20V10H14V4M4,14H10V20H4V14M14,14H20V20H14V14M16,16V18H18V16H16M6,6V8H8V6H6M6,16V18H8V16H6M16,6V8H18V6H16Z"/></svg>
-                  Apps
-                </button>
                 <button class="r-pill-btn r-power-btn" id="rPower">
                   <svg viewBox="0 0 24 24"><path d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13V3Z"/></svg>
                   Power
                 </button>
               </div>
-
-              <!-- Apps dropdown — shown below top row when Apps is tapped -->
-              <div class="r-apps-dropdown hidden" id="rAppsDropdown"></div>
 
               <!-- Touchpad — Apple Remote app style rounded rectangle -->
               <div class="clickpad-wrap">
@@ -724,50 +673,6 @@ class AtvMediaRemote extends HTMLElement {
       const state = this._hass.states[this._entity];
       const isOff  = state?.state === 'off' || state?.state === 'standby' || state?.state === 'unavailable';
       this.call(isOff ? 'turn_on' : 'turn_off');
-    });
-
-    // ── Apps button — opens dropdown of source_list from the media_player entity ──
-    const rAppsBtn      = r.getElementById('rApps');
-    const rAppsDropdown = r.getElementById('rAppsDropdown');
-
-    const closeApps = () => {
-      rAppsDropdown.classList.add('hidden');
-      rAppsBtn.classList.remove('r-apps-open');
-    };
-
-    const openApps = () => {
-      const state      = this._hass.states[this._entity];
-      const sources    = state?.attributes?.source_list || [];
-      const current    = state?.attributes?.source || '';
-      if (!sources.length) {
-        rAppsDropdown.innerHTML = `<div class="r-app-item" style="color:rgba(255,255,255,0.4);cursor:default;">No apps available</div>`;
-      } else {
-        rAppsDropdown.innerHTML = sources.map(src => `
-          <div class="r-app-item ${src === current ? 'r-app-active' : ''}" data-src="${src}">
-            <svg viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
-            ${src}
-          </div>`).join('');
-        rAppsDropdown.querySelectorAll('.r-app-item[data-src]').forEach(item => {
-          item.onclick = (e) => {
-            e.stopPropagation();
-            this.call('select_source', { source: item.dataset.src });
-            closeApps();
-          };
-        });
-      }
-      rAppsDropdown.classList.remove('hidden');
-      rAppsBtn.classList.add('r-apps-open');
-    };
-
-    rAppsBtn.onclick = (e) => {
-      e.stopPropagation();
-      rAppsDropdown.classList.contains('hidden') ? openApps() : closeApps();
-    };
-    addPressEffect(rAppsBtn);
-
-    // Close dropdown if user taps anywhere else in the remote overlay
-    r.getElementById('remoteOverlay').addEventListener('click', (e) => {
-      if (!rAppsBtn.contains(e.target) && !rAppsDropdown.contains(e.target)) closeApps();
     });
   }
 
