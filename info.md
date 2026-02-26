@@ -27,6 +27,7 @@ The card remembers how you like it. Set your preferred startup view — compact,
 - **Apple TV remote** — touchpad navigation, Back, TV home, Apps launcher, and Power with live on/off indicator
 - **App launcher** — tap Apps to see all installed apps and launch any of them instantly
 - **Smart volume** — detects Apple TV automatically and uses remote commands for reliable volume in every app; falls back to standard volume control for other players
+- **Dedicated volume entity** — optionally route volume control to a separate device such as a TV or AV receiver
 - **Volume slider or buttons** — choose a full-width drag slider or flanking + / − buttons
 - **Mini remote shortcut** — one tap in compact mode jumps straight into the remote view
 - **Multi-device switching** — manage multiple media players with drag-to-reorder and auto-switch
@@ -42,7 +43,7 @@ The card remembers how you like it. Set your preferred startup view — compact,
   <img src="preview4.png" alt="Visual editor" width="60%">
 </p>
 
-The visual editor covers everything — colour pickers for accent, volume, title and artist text, toggle switches for auto-switch, entity selector visibility, and volume button mode, a startup view selector, and a searchable drag-and-drop entity list.
+The visual editor covers everything — colour pickers for accent, volume, title and artist text, toggle switches for auto-switch, entity selector visibility, and volume button mode, a startup view selector, a volume entity dropdown to route volume to a separate device, and a searchable drag-and-drop entity list.
 
 -----
 
@@ -85,6 +86,7 @@ auto_switch: true
 show_entity_selector: true
 volume_control: slider
 startup_mode: compact
+volume_entity: media_player.lg_tv  # optional
 ```
 
 |Option                |Default  |Description                                    |
@@ -98,3 +100,4 @@ startup_mode: compact
 |`show_entity_selector`|`true`   |Show entity picker in expanded view            |
 |`volume_control`      |`slider` |`slider` or `buttons`                          |
 |`startup_mode`        |`compact`|`compact`, `maximised`, or `remote`            |
+|`volume_entity`       |—        |Route volume to a separate `media_player` entity (e.g. a TV or AV receiver). Defaults to the active media player if not set|
