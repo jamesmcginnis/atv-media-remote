@@ -19,6 +19,7 @@ A sleek, Apple-inspired custom media player card for [Home Assistant](https://ww
 - **Apple TV remote control** — rounded rectangle touchpad with Up / Down / Left / Right / Select navigation, Back, TV home, Apps launcher, and Power on/off with live state indicator
 - **App launcher** — tap Apps to see all installed apps on your Apple TV and launch any of them instantly
 - **Smart volume control** — automatically detects Apple TV and uses `remote.send_command` for reliable volume across every app (YouTube, Infuse, Plex, Netflix, Disney+ and more); falls back to standard `volume_set` for all other media players
+- **Dedicated volume entity** — optionally route volume control to a separate device such as a TV or AV receiver, independent of the active media player
 - **Volume slider or buttons** — choose between a full-width drag slider or flanking + / − buttons to match your preference
 - **Mini remote shortcut** — single tap in compact mode expands the card and opens the remote simultaneously
 - **Multi-device switching** — add multiple media players, drag to reorder, auto-switch to whichever is currently playing
@@ -93,6 +94,7 @@ auto_switch: true
 show_entity_selector: true
 volume_control: slider
 startup_mode: compact
+volume_entity: media_player.lg_tv  # optional
 ```
 
 -----
@@ -112,6 +114,7 @@ All options are available in the visual editor. The table below is for YAML refe
 |`show_entity_selector`|boolean|`true`      |Show the entity picker dropdown in expanded view             |
 |`volume_control`      |string |`slider`    |`slider` for a drag slider, `buttons` for + / − buttons      |
 |`startup_mode`        |string |`compact`   |Starting view: `compact`, `maximised`, or `remote`           |
+|`volume_entity`       |string |—           |Route volume to a separate `media_player` entity (e.g. `media_player.lg_tv`). Useful when playback is handled by an Apple TV but audio volume is controlled by a TV or AV receiver. Defaults to the active media player if not set|
 
 -----
 
@@ -191,6 +194,16 @@ Tapping **Apps** in the remote view reads the `source_list` attribute from your 
 
 The card automatically detects whether the selected media player has a paired Apple TV remote entity and adjusts its behaviour accordingly — no configuration needed.
 
+**Dedicated volume entity**
+
+If your audio setup separates playback from volume control — for example, an Apple TV handles media while a TV or AV receiver controls audio — set `volume_entity` to the entity that owns the volume. All slider and button volume commands will be routed to that entity instead of the active media player. The volume slider position reflects the `volume_level` of the volume entity in real time.
+
+```yaml
+volume_entity: media_player.lg_tv
+```
+
+This option is available in the visual editor as a dropdown listing all available `media_player` entities. Leave it unset (or select *Same as active media player*) to use the default behaviour.
+
 **Apple TV (remote entity detected)**
 
 When a `remote.*` entity is found matching your `media_player.*` entity name, the volume control sends `volume_up` and `volume_down` remote commands. This works reliably in every app including YouTube, Infuse, Plex, Netflix, and Disney+.
@@ -246,6 +259,7 @@ To reorder entities, open the visual editor and drag the handles next to each de
 |**Show Media Player Selector**    |Toggle the entity picker dropdown in expanded view                         |
 |**Use Volume Buttons**            |Switch between slider and + / − button volume control                      |
 |**Startup View**                  |Choose whether the card opens in Compact, Maximised, or Remote Control mode|
+|**Volume Entity**                 |Select a separate `media_player` entity to handle volume. Useful when an Apple TV plays media but a TV or AV receiver controls audio. Defaults to the active media player|
 |**Manage & Reorder Media Players**|Searchable, drag-and-drop entity list                                      |
 
 -----
