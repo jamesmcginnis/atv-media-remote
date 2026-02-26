@@ -1,5 +1,5 @@
 /**
- * ATV Media Remote
+ * ATV Media Remote 
  * Includes: Reordering, Mobile Support, Pressed Glow Effects, Connection Safety, and Remote Control.
  */
 
