@@ -21,7 +21,7 @@ class AtvMediaRemote extends HTMLElement {
   }
 
   static getStubConfig() {
-    return { entities: [], auto_switch: true, accent_color: '#007AFF', volume_accent: '#007AFF', title_color: '#ffffff', artist_color: '#ffffff', show_entity_selector: true, volume_control: 'slider', startup_mode: 'compact' };
+    return { entities: [], auto_switch: true, accent_color: '#007AFF', volume_accent: '#007AFF', title_color: '#ffffff', artist_color: '#ffffff', show_entity_selector: true, volume_control: 'slider', startup_mode: 'compact', volume_entity: '' };
   }
 
   setConfig(config) {
@@ -36,6 +36,7 @@ class AtvMediaRemote extends HTMLElement {
       show_entity_selector: true,
       volume_control: 'slider',
       startup_mode: 'compact',
+      volume_entity: '',
       ...config
     };
     if (!this._entity) this._entity = this._config.entities[0];
@@ -158,6 +159,12 @@ class AtvMediaRemote extends HTMLElement {
         }
       }
     }
+  }
+
+  // Returns the entity to use for volume — either the dedicated volume_entity or the main entity
+  get _volEntity() {
+    const ve = this._config?.volume_entity;
+    return (ve && ve.trim()) ? ve.trim() : this._entity;
   }
 
   sendRemoteCommand(command) {
@@ -614,17 +621,20 @@ class AtvMediaRemote extends HTMLElement {
 
     // ── Volume +/- button listeners (use same smart Apple TV detection as slider) ──
     const sendVolCmd = (direction) => {
-      const remoteEntityId = this._entity.replace('media_player.', 'remote.');
-      const hasRemote = !!this._hass.states[remoteEntityId];
+      const volEnt = this._volEntity;
+      const isMainEntity = volEnt === this._entity;
+      // Only use the Apple TV remote trick when volume is routed to the main entity
+      const remoteEntityId = isMainEntity ? this._entity.replace('media_player.', 'remote.') : null;
+      const hasRemote = remoteEntityId && !!this._hass.states[remoteEntityId];
       if (hasRemote) {
         this._hass.callService('remote', 'send_command', {
           entity_id: remoteEntityId,
           command: direction > 0 ? 'volume_up' : 'volume_down'
         }).catch(() => {});
       } else {
-        const state = this._hass.states[this._entity];
+        const state = this._hass.states[volEnt];
         const current = state?.attributes?.volume_level || 0;
-        this.call('volume_set', { volume_level: Math.min(1, Math.max(0, current + direction * 0.05)) });
+        this._hass.callService('media_player', 'volume_set', { entity_id: volEnt, volume_level: Math.min(1, Math.max(0, current + direction * 0.05)) });
       }
     };
     r.getElementById('btnVolUp').onclick   = () => sendVolCmd(1);
@@ -636,8 +646,11 @@ class AtvMediaRemote extends HTMLElement {
 
     slider.oninput = (e) => {
       const newLevel = parseFloat(e.target.value) / 100;
-      const remoteEntityId = this._entity.replace('media_player.', 'remote.');
-      const hasRemote = !!this._hass.states[remoteEntityId];
+      const volEnt = this._volEntity;
+      const isMainEntity = volEnt === this._entity;
+      // Only use the Apple TV remote trick when volume is routed to the main entity
+      const remoteEntityId = isMainEntity ? this._entity.replace('media_player.', 'remote.') : null;
+      const hasRemote = remoteEntityId && !!this._hass.states[remoteEntityId];
 
       if (hasRemote) {
         const prev = this._lastVolume !== null
@@ -668,7 +681,7 @@ class AtvMediaRemote extends HTMLElement {
           this._lastVolume = newLevel;
         }
       } else {
-        this.call('volume_set', { volume_level: newLevel });
+        this._hass.callService('media_player', 'volume_set', { entity_id: volEnt, volume_level: newLevel });
         this._lastVolume = newLevel;
       }
     };
@@ -861,7 +874,8 @@ class AtvMediaRemote extends HTMLElement {
     r.getElementById('playIcon').innerHTML = isPlaying
       ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'
       : '<path d="M8 5v14l11-7z"/>';
-    r.getElementById('vSlider').value = (state.attributes.volume_level || 0) * 100;
+    const volState = this._hass?.states[this._volEntity];
+    r.getElementById('vSlider').value = (volState?.attributes?.volume_level ?? state.attributes.volume_level ?? 0) * 100;
     r.getElementById('pTot').textContent = this.formatTime(state.attributes.media_duration || 0);
 
     const sel = r.getElementById('eSelector');
@@ -922,6 +936,8 @@ class AtvMediaRemoteEditor extends HTMLElement {
     if (volBtnInput) volBtnInput.checked = this._config.volume_control === 'buttons';
     const startupModeInput = root.getElementById('startup_mode');
     if (startupModeInput) startupModeInput.value = this._config.startup_mode || 'compact';
+    const volEntityInput = root.getElementById('volume_entity');
+    if (volEntityInput) volEntityInput.value = this._config.volume_entity || '';
   }
 
   render() {
@@ -996,6 +1012,19 @@ class AtvMediaRemoteEditor extends HTMLElement {
               <option value="remote">Remote Control</option>
             </select>
           </div>
+        </div>
+        <div class="row">
+          <label>Volume Entity <span style="font-weight:normal;font-size:12px;color:#888;">(optional — route volume to a different device)</span></label>
+          <select id="volume_entity" style="background:var(--card-background-color);color:var(--primary-text-color);border:1px solid #444;border-radius:4px;padding:5px 8px;font-size:13px;cursor:pointer;width:100%;">
+            <option value="">— Same as active media player —</option>
+            ${Object.keys(this._hass.states)
+              .filter(e => e.startsWith('media_player.'))
+              .sort()
+              .map(e => {
+                const name = this._hass.states[e]?.attributes?.friendly_name || e;
+                return `<option value="${e}">${name}</option>`;
+              }).join('')}
+          </select>
         </div>
         <div class="row">
           <label>Manage & Reorder Media Players</label>
@@ -1102,6 +1131,7 @@ class AtvMediaRemoteEditor extends HTMLElement {
     root.getElementById('show_entity_selector').onchange = (e) => this._updateConfig('show_entity_selector', e.target.checked);
     root.getElementById('volume_control_btn').onchange   = (e) => this._updateConfig('volume_control', e.target.checked ? 'buttons' : 'slider');
     root.getElementById('startup_mode').onchange         = (e) => this._updateConfig('startup_mode', e.target.value);
+    root.getElementById('volume_entity').onchange        = (e) => this._updateConfig('volume_entity', e.target.value);
   }
 
   _updateConfig(key, value) {
