@@ -2,9 +2,12 @@
 
 A beautiful, Apple-inspired media player card for Home Assistant with seamless device switching, Music Assistant integration, Apple TV remote control, rich media info panels, and a sleek dark interface. Optimised for iPhone Dashboards.
 
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.1+-blue)
 ![HACS](https://img.shields.io/badge/HACS-Custom-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
+[![Open your Home Assistant instance and add this repository to HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jamesmcginnis&repository=atv-media-remote&category=plugin)
 
 ---
 
