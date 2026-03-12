@@ -1,388 +1,305 @@
 # ATV Media Remote
 
-A beautiful, Apple-inspired media player card for Home Assistant with seamless device switching, Music Assistant integration, Apple TV remote control, rich media info panels, and a sleek dark interface. Optimised for iPhone Dashboards.
+A sleek, Apple-inspired custom media player card for [Home Assistant](https://www.home-assistant.io/) with a built-in Apple TV remote control, smart volume handling, multi-device switching, and a fully visual editor. No YAML required.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.1+-blue)
-![HACS](https://img.shields.io/badge/HACS-Custom-orange)
-![License](https://img.shields.io/badge/license-MIT-green)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jamesmcginnis&repository=atv-media-remote&category=dashboard)
 
-[![Open your Home Assistant instance and add this repository to HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jamesmcginnis&repository=atv-media-remote&category=plugin)
+<p align="center">
+  <img src="preview1.png" alt="Compact view" width="32%">
+  <img src="preview2.png" alt="Maximised view" width="32%">
+  <img src="preview3.png" alt="Remote control view" width="32%">
+</p>
 
----
+-----
 
-## 📸 Screenshots
+## Features
 
-### Expanded Mode
-![Expanded Mode](preview1.png)
-*Full album artwork display with all controls*
+- **Three view modes** — compact strip, full expanded view, and Apple TV remote control overlay
+- **Configurable startup view** — choose whether the card opens in compact, maximised, or remote control mode every time
+- **Apple TV remote control** — rounded rectangle touchpad with Up / Down / Left / Right / Select navigation, Back, TV home, Apps launcher, and Power on/off with live state indicator
+- **App launcher** — tap Apps to see all installed apps on your Apple TV and launch any of them instantly
+- **Smart volume control** — automatically detects Apple TV and uses `remote.send_command` for reliable volume across every app (YouTube, Infuse, Plex, Netflix, Disney+ and more); falls back to standard `volume_set` for all other media players
+- **Dedicated volume entity** — optionally route volume control to a separate device such as a TV or AV receiver, independent of the active media player
+- **Volume slider or buttons** — choose between a full-width drag slider or flanking + / − buttons to match your preference
+- **Mini remote shortcut** — single tap in compact mode expands the card and opens the remote simultaneously
+- **Multi-device switching** — add multiple media players, drag to reorder, auto-switch to whichever is currently playing
+- **Live progress bar** — interpolated second-by-second updates, tap anywhere to seek
+- **Full colour customisation** — separate colour pickers for accent, volume slider, song title, and artist name
+- **Visual editor** — drag-and-drop entity management with no YAML required
+- **Press glow effects** — tactile button feedback throughout
 
-### Compact / Mini Player Mode
-![Compact Mode](preview2.png)
-*Space-saving mini player view*
+-----
 
-### Apple TV Remote Control
-![Remote Control](preview3.png)
-*Built-in remote — directional pad, Back, Home, Apps and Power*
+## Visual Editor
 
-### Music Assistant Library Browser
-![MA Browser](preview4.png)
-*Browse and play from your Music Assistant library*
+<p align="center">
+  <img src="preview4.png" alt="Visual editor" width="60%">
+</p>
 
-### Discogs Music Info Panel
-![Media Info](preview5.png)
-*Discogs music info with tracklist, ratings and artwork — tap any album art to open*
+-----
 
-### Visual Configuration Editor
-![Configuration Editor](preview6.png)
-*Full visual editor — per-entity startup volumes, colour pickers, no YAML required*
+## Requirements
 
-### MA Track Playback from Media Info
-![MA Track Confirm](preview7.png)
-*Tap any track in the Discogs info panel to trigger a Music Assistant play confirmation — showing track, artist and target speaker before committing*
+- Home Assistant 2023.1 or later
+- One or more `media_player` entities
+- A corresponding `remote.*` entity for Apple TV remote and smart volume features (provided automatically by the [Apple TV integration](https://www.home-assistant.io/integrations/apple_tv/))
 
-### TMDB Media Info Panel
-![TMDB Media Info](preview8.png)
-*TV and movie info from TMDB — cast, overview, poster and ratings with a back-navigable picker for ambiguous titles*
+-----
 
----
+## Installation
 
-## ✨ Features
+### HACS (Recommended)
 
-### Core
-- 🎨 **Apple-inspired design** — dark frosted-glass theme with customisable accent colours
-- 📱 **Compact and expanded modes** — toggle between full album art and a space-saving mini player
-- 🔄 **Automatic device switching** — card follows whichever device starts playing
-- 🎵 **Full media controls** — play/pause, skip, shuffle, repeat, seek via progress bar
-- ✨ **Tactile button feedback** — glow and blur effects when buttons are pressed
-- 🔊 **Volume control** — slider or +/− buttons, with optional routing to a separate volume entity
-- 🔇 **Mute toggle** — tap the volume percentage badge or speaker icon to instantly mute/unmute
-- 🖼️ **Album artwork** — with smart fallback device icons when artwork fails to load
-- 📋 **Multi-device support** — manage several media players from a single card
-- 🎯 **Live progress tracking** — smooth real-time position updates without extra polling
-- 🔁 **Alexa keep-alive** — keeps Alexa entities responsive while they're active
-- 🔍 **Long press for more info** — long press the album artwork or fallback icon (expanded mode) to open the Home Assistant more-info dialog for the active entity
+1. Open HACS in your Home Assistant instance
+1. Click on **Frontend**
+1. Click the three dots menu in the top right and select **Custom repositories**
+1. Add `https://github.com/jamesmcginnis/atv-media-remote` and select **Dashboard** as the category
+1. Click **Install**
+1. Restart Home Assistant
 
-### Media Info Panels
-- 🎵 **Discogs music lookup** — tap album art on a music track to fetch full release info: tracklist, label, year, country, formats, genres and a community star rating
-- 🎬 **TMDB TV & movie lookup** — tap album art on video content to fetch cast, overview, poster and ratings; an interactive picker resolves ambiguous TV vs movie titles
-- 🔗 **Discogs track links** — each track row in the music info panel links directly to its Discogs page
-- 🎵 **MA playback from tracklist** — when a Music Assistant speaker is active, every track row in the Discogs info panel becomes tappable; a confirmation dialog shows the track title, artist and target speaker before playing via Music Assistant
+### Manual
 
-### Apple TV Remote
-- 📺 Built-in remote overlay with directional pad, Select, Back, Home, Apps and Power
-- 📋 **Apps dropdown** — populated directly from the Apple TV's source list
-- 🔇 **Auto-hidden** for non-Apple-TV players
+1. Download `atv-media-remote.js` from this repository
+1. Copy it to your Home Assistant `config/www/` folder
+1. Go to **Settings → Dashboards → Resources** and add:
+   
+   |Field|Value                       |
+   |-----|----------------------------|
+   |URL  |`/local/atv-media-remote.js`|
+   |Type |`JavaScript Module`         |
+1. Refresh your browser cache (Ctrl + Shift + R / Cmd + Shift + R)
 
-### Music Assistant Integration
-- 🎶 **Automatic detection** — no manual configuration; uses the HA entity registry
-- 📚 **Library browser** — Playlists, Artists, Albums, Tracks, Radio, Favourites and Search
-- 🖱️ Tap any item to start playback immediately on the selected speaker
-- 📱 **Compact view aware** — tapping the browse button expands the card first
+-----
 
-### Volume & Startup
-- 🚀 **Per-entity startup volume** — set an individual volume level for each speaker that gets applied automatically when a new track starts; configured directly in the visual editor
-- 🛡️ **Safe volume handling** — volume commands are only sent to devices that support them, preventing errors on Apple TV and similar devices
+## Adding the Card to a Dashboard
 
-### Configuration
-- ⚙️ **Full visual editor** — drag-and-drop entity reordering, search/filter, colour pickers
-- 🚀 **Startup mode** — open in compact, maximised or remote mode on every load
-- 🎨 **Deep colour control** — accent, volume, title, artist, button, volume % and background; native colour picker tiles with hex input on every field; full alpha support via 8-digit hex or use `#000000` as a shortcut for fully transparent
-- 🔊 **Per-entity startup volumes** — set directly from the entity list in the editor
+1. Open a Dashboard and click **Edit** (pencil icon, top right)
+1. Click **+ Add Card**
+1. Scroll to the bottom and select **ATV Media Remote**
+1. Configure your entities and preferences using the visual editor
+1. Click **Save**
 
----
-
-## 🚀 Installation
-
-### Manual Installation
-
-1. Download `atv-media-remote.js`
-2. Copy it into your `config/www/` folder
-3. Add the resource in your Lovelace configuration:
-
-```yaml
-lovelace:
-  resources:
-    - url: /local/atv-media-remote.js
-      type: module
-```
-
-4. Restart Home Assistant
-
----
-
-## ⚙️ Configuration
-
-### Quick Start
-
-1. Edit your dashboard and click **Add Card**
-2. Search for **ATV Media Remote**
-3. Use the **visual editor** to select your media players and configure colours
-4. Hit **Save** — done!
-
-### YAML Example
+Alternatively, configure the card manually in YAML:
 
 ```yaml
 type: custom:atv-media-remote
 entities:
-  - media_player.living_room_apple_tv
-  - media_player.living_room_homepod
-  - media_player.kitchen_alexa
-  - media_player.mass_living_room
-accent_color: '#007AFF'
-volume_accent: '#30D158'
+  - media_player.apple_tv_living_room
+  - media_player.bedroom_speaker
+accent_color: "#007AFF"
+volume_accent: "#007AFF"
+title_color: "#ffffff"
+artist_color: "#ffffff"
 auto_switch: true
-startup_mode: compact
-volume_control: slider
 show_entity_selector: true
-tmdb_api_key: 'your_tmdb_v3_key'
-entity_startup_volumes:
-  media_player.living_room_homepod: 25
-  media_player.kitchen_alexa: 40
+volume_control: slider
+startup_mode: compact
+volume_entity: media_player.lg_tv  # optional
 ```
 
-### All Options
+-----
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `entities` | list | **Required** | Media player entity IDs to include |
-| `accent_color` | string | `#007AFF` | Main accent colour (hex) |
-| `volume_accent` | string | same as accent | Separate colour for the volume slider |
-| `title_color` | string | `#ffffff` | Track title text colour |
-| `artist_color` | string | `#ffffff` | Artist name text colour |
-| `button_color` | string | `#ffffff` | Media control button icon colour |
-| `vol_pct_color` | string | `rgba(255,255,255,0.45)` | Volume percentage badge colour |
-| `player_bg` | string | `#1c1c1e` | Card background colour. `#000000` = fully transparent. Use 8-digit hex (e.g. `#1c1c1e80`) for partial opacity |
-| `auto_switch` | boolean | `true` | Auto-follow whichever device starts playing |
-| `remember_last_entity` | boolean | `false` | Remember the last manually selected entity |
-| `show_entity_selector` | boolean | `true` | Show/hide the device selector dropdown |
-| `scroll_text` | boolean | `false` | Scroll long track/artist text instead of truncating |
-| `volume_control` | string | `slider` | `slider` or `buttons` |
-| `show_vol_pct` | boolean | `true` | Show or hide the volume percentage badge |
-| `volume_entity` | string | `''` | Route volume control to a different entity |
-| `startup_mode` | string | `compact` | `compact`, `maximised`, or `remote` |
-| `tmdb_api_key` | string | `''` | TMDB v3 API key for TV and movie info lookups |
-| `entity_startup_volumes` | map | `{}` | Per-entity startup volume levels (0–100) |
-| `ma_entities` | list | `[]` | Manual override — force specific entity IDs to be treated as Music Assistant speakers (useful if auto-detection fails) |
+## Configuration Options
 
----
+All options are available in the visual editor. The table below is for YAML reference.
 
-## 🖥️ Visual Editor Guide
+|Option                |Type   |Default     |Description                                                  |
+|----------------------|-------|------------|-------------------------------------------------------------|
+|`entities`            |list   |**required**|One or more `media_player` entity IDs                        |
+|`accent_color`        |string |`#007AFF`   |Colour of the progress bar and active shuffle/repeat icons   |
+|`volume_accent`       |string |`#007AFF`   |Colour of the volume slider                                  |
+|`title_color`         |string |`#ffffff`   |Colour of the song or show title text                        |
+|`artist_color`        |string |`#ffffff`   |Colour of the artist or friendly name text                   |
+|`auto_switch`         |boolean|`true`      |Automatically switch to whichever entity is currently playing|
+|`show_entity_selector`|boolean|`true`      |Show the entity picker dropdown in expanded view             |
+|`volume_control`      |string |`slider`    |`slider` for a drag slider, `buttons` for + / − buttons      |
+|`startup_mode`        |string |`compact`   |Starting view: `compact`, `maximised`, or `remote`           |
+|`volume_entity`       |string |—           |Route volume to a separate `media_player` entity (e.g. `media_player.lg_tv`). Useful when playback is handled by an Apple TV but audio volume is controlled by a TV or AV receiver. Defaults to the active media player if not set|
 
-Open the editor by clicking the **pencil icon** on your card.
+-----
 
-### Managing Media Players
+## Using the Card
 
-- **Search box** — filter the entity list by name; the full list reappears after each selection so you can keep ticking multiple speakers
-- **Checkboxes** — tick any entity to add it to the card; a **Vol** input appears on the row
-- **Vol input** — enter 0–100 for that speaker's startup volume; leave blank for no startup volume
-- **Drag handles** (⠿) — drag checked entities to reorder them in the selector
-- On mobile, use the grip icon on the left of each row
+### Compact Mode
 
-### Colours Section
+The card sits as a slim strip showing the album art thumbnail, track title, artist, a progress bar, playback controls, and volume. Recommended for dashboards where space is limited.
 
-Each colour is shown as a tile with a large clickable swatch at the top and the hex value beneath. Click the swatch to open the native colour picker, or type directly into the hex field. A checkerboard pattern shows through the swatch when a colour has transparency.
+Every time you navigate back to the page or reload the app, the card returns to whichever view you have set as the **Startup View**.
 
-| Field | Controls |
-|-------|----------|
-| **Main Accent** | Progress bar, active shuffle/repeat icons, highlights |
-| **Volume Accent** | Volume slider track colour (independent from accent) |
-| **Song Title** | Track title text colour |
-| **Song Artist** | Artist name text colour |
-| **Button Colour** | All media control button icon colours |
-| **Volume % Colour** | The volume percentage badge colour |
-| **Player Background** | Card background colour. Enter `#000000` for fully transparent, or use 8-digit hex (e.g. `#1c1c1e80`) for partial opacity |
+|Element               |Action                                                            |
+|----------------------|------------------------------------------------------------------|
+|**Thumbnail**         |Tap to open the Home Assistant media info panel                   |
+|**Progress bar**      |Thin accent-coloured bar showing current playback position        |
+|**📱 Remote icon**     |Tap to expand the card and open the remote control view in one tap|
+|**⏮ / ▶⏸ / ⏭**        |Previous / Play-Pause / Next                                      |
+|**Volume**            |Drag slider or tap + / − buttons depending on your setting        |
+|**⤢ icon** (top right)|Expand to full view                                               |
 
-### Toggles
+-----
 
-| Toggle | What it does |
-|--------|--------------|
-| **Auto Switch Entities** | Card automatically moves to whichever player starts playing |
-| **Remember Last Entity** | Persists your manual player selection across dashboard reloads |
-| **Show Media Player Selector** | Shows or hides the device dropdown |
-| **Use Volume Buttons** | Replaces the volume slider with +/− buttons |
-| **Show Volume Percentage** | Shows or hides the volume % badge |
-| **Scroll Long Track / Artist Text** | Scrolls text instead of truncating with ellipsis |
+### Expanded Mode
+
+The card shows full-size album art with all controls and a seekable progress bar.
+
+|Element                         |Action                                                        |
+|--------------------------------|--------------------------------------------------------------|
+|**Album art**                   |Tap to open the Home Assistant media info panel               |
+|**Progress bar**                |Tap anywhere along the bar to seek to that position           |
+|**Shuffle icon**                |Toggle shuffle on/off. Highlights in accent colour when active|
+|**⏮ / ▶⏸ / ⏭**                  |Previous / Play-Pause / Next                                  |
+|**Repeat icon**                 |Cycle through Off → Repeat All → Repeat One                   |
+|**Volume**                      |Drag slider or tap + / − buttons depending on your setting    |
+|**📱 Remote icon** (on album art)|Open or close the Apple TV remote overlay                     |
+|**Entity selector**             |Switch between your configured media players                  |
+|**⤡ icon** (top right)          |Collapse back to compact mode                                 |
+
+-----
+
+### Remote Control View
+
+Tapping the remote icon replaces the album art with a full Apple Remote-style interface. All card controls below — progress bar, playback buttons, volume, entity selector — remain fully functional while the remote is open.
+
+**Top row**
+
+|Button    |Description                                                      |
+|----------|-----------------------------------------------------------------|
+|**Back**  |Go back within the current app (`menu` command)                  |
+|**TV**    |Return to the Apple TV home screen (`home` command)              |
+|**Apps**  |Open a dropdown listing all installed apps — tap any to launch it|
+|**Power** |Toggle Apple TV power. Glows red when the device is on           |
+|**⤡ icon**|Collapse the card to compact mode without leaving the remote     |
+
+**Touchpad**
+
+|Area             |Action        |
+|-----------------|--------------|
+|**Top edge**     |Navigate Up   |
+|**Bottom edge**  |Navigate Down |
+|**Left edge**    |Navigate Left |
+|**Right edge**   |Navigate Right|
+|**Centre button**|Select / OK   |
+
+
+> **Tip:** The 📱 icon in compact mode expands the card and enters the remote view in a single tap.
+
+-----
+
+### App Launcher
+
+Tapping **Apps** in the remote view reads the `source_list` attribute from your Apple TV media player entity and displays all installed apps in a scrollable dropdown. The currently active app is highlighted. Tap any app to launch it via `media_player.select_source`. The dropdown closes automatically after selection or if you tap anywhere else in the remote view.
+
+-----
+
+### Volume Control
+
+The card automatically detects whether the selected media player has a paired Apple TV remote entity and adjusts its behaviour accordingly — no configuration needed.
+
+**Dedicated volume entity**
+
+If your audio setup separates playback from volume control — for example, an Apple TV handles media while a TV or AV receiver controls audio — set `volume_entity` to the entity that owns the volume. All slider and button volume commands will be routed to that entity instead of the active media player. The volume slider position reflects the `volume_level` of the volume entity in real time.
+
+```yaml
+volume_entity: media_player.lg_tv
+```
+
+This option is available in the visual editor as a dropdown listing all available `media_player` entities. Leave it unset (or select *Same as active media player*) to use the default behaviour.
+
+**Apple TV (remote entity detected)**
+
+When a `remote.*` entity is found matching your `media_player.*` entity name, the volume control sends `volume_up` and `volume_down` remote commands. This works reliably in every app including YouTube, Infuse, Plex, Netflix, and Disney+.
+
+The slider uses a throttled approach — one command fires immediately on first movement, then one per ~380ms while dragging continues, with a trailing command to ensure the final position always registers.
+
+**Standard media players**
+
+For any player without a matched remote entity, the volume control uses `media_player.volume_set` for precise absolute control.
+
+**Slider vs Buttons**
+
+Toggle **Use Volume Buttons** in the visual editor to switch between:
+
+- **Slider** — a full-width drag bar sitting on its own row below the playback controls, aligned with the progress bar
+- **Buttons** — a − button on the left and + button on the right of the playback controls row, each sending one volume step per tap
+
+-----
 
 ### Startup View
 
-- **Compact** *(default)* — opens as the mini player
-- **Maximised** — opens in full expanded view with album art
-- **Remote Control** — opens directly into Apple TV remote mode
+Set the **Startup View** option in the visual editor to control which mode the card opens in:
 
-### Volume Entity
+- **Compact** — the slim strip (default)
+- **Maximised** — full album art view
+- **Remote Control** — opens directly into the remote overlay
 
-Optionally route all volume commands to a different media player entity — useful when an Apple TV feeds into a HomePod or a TV feeds into a separate amplifier.
+The card snaps back to this view every time you navigate to the page or reload the app. Changing the setting in the editor takes effect immediately.
 
-### Media Info (TMDB API Key)
+-----
 
-Tap any album art to open the media info panel. Music lookups use Discogs (no key needed). TV and movie lookups use TMDB — add a free v3 API key from [themoviedb.org](https://www.themoviedb.org/settings/api).
+## Multi-Device Switching
 
----
+Add multiple `media_player` entities to the `entities` list. The card will:
 
-## 📖 Usage Guide
+- Show an entity selector dropdown in expanded mode to switch between devices manually
+- Automatically switch to any entity that starts playing when `auto_switch: true`
+- Preserve manual selections until you switch away or the device becomes inactive
 
-### Compact vs Expanded
+To reorder entities, open the visual editor and drag the handles next to each device name.
 
-Click the **resize button** (↗ icon, top-right) to toggle between modes.
+-----
 
-### Media Info Panel
+## Visual Editor
 
-Tap the **album artwork** or poster to open a media info panel:
+|Setting                           |Description                                                                |
+|----------------------------------|---------------------------------------------------------------------------|
+|**Main Accent**                   |Colour of the progress bar fill and active shuffle/repeat icons            |
+|**Volume Accent**                 |Colour of the volume slider thumb and track                                |
+|**Song Title**                    |Colour of the track or show title text                                     |
+|**Song Artist**                   |Colour of the artist name or device friendly name                          |
+|**Auto Switch Entities**          |Toggle automatic device switching                                          |
+|**Show Media Player Selector**    |Toggle the entity picker dropdown in expanded view                         |
+|**Use Volume Buttons**            |Switch between slider and + / − button volume control                      |
+|**Startup View**                  |Choose whether the card opens in Compact, Maximised, or Remote Control mode|
+|**Volume Entity**                 |Select a separate `media_player` entity to handle volume. Useful when an Apple TV plays media but a TV or AV receiver controls audio. Defaults to the active media player|
+|**Manage & Reorder Media Players**|Searchable, drag-and-drop entity list                                      |
 
-- **Music** — fetches the full Discogs release: tracklist, label, year, formats, genres, country and community star rating. If the match is ambiguous a release picker appears with artwork and pressing details. **A ← Back button lets you return to the picker and choose a different release without re-fetching.**
-- **TV & Movies** — fetches cast, overview, poster and ratings from TMDB. An interactive picker resolves ambiguous TV vs movie titles with colour-coded badges. **A ← Back button lets you return to the picker and choose a different result without re-fetching.**
+-----
 
-### Home Assistant More Info
+## Apple TV Setup
 
-**Long press** (hold for ~½ second) the album artwork or fallback device icon in **expanded mode** to open the standard Home Assistant more-info dialog for the active media player entity. This gives you access to the full entity history, attributes and any extra controls provided by your integration.
+Install and configure the [Apple TV integration](https://www.home-assistant.io/integrations/apple_tv/) in Home Assistant. This automatically creates both a `media_player.*` and a `remote.*` entity for each Apple TV on your network.
 
-> On iPhone the long press works identically — the native iOS image save menu is suppressed so the HA dialog opens instead.
+The card derives the remote entity name automatically — if your media player is `media_player.apple_tv_lounge`, the card sends remote commands to `remote.apple_tv_lounge`. Ensure both entities are enabled in **Settings → Devices & Services → Apple TV**.
 
-### Playing from the Tracklist (Music Assistant)
+-----
 
-When a Music Assistant speaker is active, the Discogs tracklist becomes interactive. Each track row shows a ▶ play hint on hover or tap:
+## Troubleshooting
 
-1. **Tap a track** — a confirmation dialog appears showing the track title, artist and the name of the speaker it will play on
-2. **Tap Play** — the card searches your MA library, scores the results to find the best match, and starts playback immediately via Music Assistant
-3. **Tap Cancel** — dismiss and choose a different track
-4. On success the dialog confirms **"✓ Playing now"** and closes automatically
+**Volume has no effect on Apple TV in YouTube, Infuse, etc.**
+Ensure the Apple TV integration is installed and a `remote.*` entity exists for your device. Verify it is enabled in **Settings → Devices & Services → Apple TV → entities**.
 
-This lets you browse a full album from the info panel and jump to any track without leaving your dashboard.
+**Apps dropdown is empty**
+Confirm your Apple TV integration is connected and the media player entity is reporting a `source_list` attribute. Check in **Developer Tools → States** and search for your entity.
 
-> On non-MA speakers, track rows link directly to the Discogs page for that track instead.
+**Remote commands do not respond**
+Confirm your Apple TV is on and the integration shows as connected. Test with **Developer Tools → Services** — call `remote.send_command` with your remote entity ID and `command: select`.
 
-> **Playback:** Tapping a track starts it immediately — it replaces the current queue rather than adding to the end, so you hear it straight away.
+**Power button does not turn Apple TV on**
+Enable **Wake on Network Access** in your Apple TV settings under **AirPlay and Handoff**.
 
-> **MA not detected?** If the ▶ hints don't appear for a known MA speaker, add its entity ID to `ma_entities` in your YAML config as a manual override.
+**Card not appearing after manual installation**
+Clear your browser cache with Ctrl + Shift + R (Windows/Linux) or Cmd + Shift + R (Mac). On the HA mobile app, fully close and reopen it.
 
-### Browsing Your Music Assistant Library
+**Auto-switch is not working**
+Check that `auto_switch: true` is set and that the playing entity is in your `entities` list. Manual selections are respected — switch to a different entity or wait for the current one to stop to re-enable auto-switch.
 
-Two complementary ways to discover and play via Music Assistant:
+**Progress bar not updating**
+The bar interpolates locally every second and re-syncs from HA on every state update. If it appears frozen, check that your media player entity reports `media_position` and `media_position_updated_at` attributes — not all integrations provide these.
 
-**Library Browser (♪ button)** — while any MA speaker is selected the ♪ button appears on the card. Tap to open the full browser with tabs for Playlists, Artists, Albums, Tracks, Radio, Favourites and Search. Tap any item to start playback immediately.
+**Card always opens in wrong mode**
+Check the **Startup View** setting in the visual editor. The card resets to this view on every page load and navigation.
 
-**From the album art** — tap the album artwork while a track is playing on an MA speaker. The Discogs info panel opens showing the full tracklist. Tap any track to play it via the confirmation dialog above. Great for exploring an album and queuing specific tracks while staying on your dashboard.
+-----
 
-**When nothing is playing** — when an MA speaker is idle or paused, the artwork area shows a music note icon with a **Browse library** hint. Tap it to open the MA library browser directly.
+## License
 
-### Startup Volume
-
-Set per-entity levels in the visual editor (tick a speaker → **Vol** input), or via YAML using `entity_startup_volumes`. The card only applies the volume on devices that support it.
-
-### Mute Toggle
-
-| Device | Mute method |
-|--------|-------------|
-| **Alexa** (modern), **Sonos**, **Chromecast** | Full mute support via Home Assistant |
-| **Apple TV** | Soft-mute — sets volume to 0, restores on unmute |
-| **HomePod** | Soft-mute — sets volume to 0, restores on unmute |
-| **Music Assistant speakers** | Soft-mute — sets volume to 0, restores on unmute |
-
-> Move the slider at least once before muting so the card has a level to restore. If no prior level is known, unmute defaults to 50%.
-
-### Apple TV Remote
-
-| Button | Action |
-|--------|--------|
-| ← Back | Menu / back navigation |
-| 🏠 Home | Return to Apple TV home screen |
-| Apps | Opens a list of all sources and apps |
-| Power | Toggle power on/off |
-| ↑ ↓ ← → | Directional navigation |
-| ● centre | Select / OK |
-
-### Music Assistant Library Browser
-
-| Tab | Contents |
-|-----|----------|
-| Playlists | Your saved playlists |
-| Artists | Browse by artist |
-| Albums | Browse by album |
-| Tracks | Individual tracks |
-| Radio | Radio stations |
-| Favourites | Your starred items |
-| 🔍 Search | Search your entire MA library |
-
----
-
-## 🧠 Smart Device Detection
-
-| Device | Detection method | Remote | MA button |
-|--------|-----------------|:------:|:---------:|
-| **Apple TV** | `device_class: tv` | ✅ | ❌ |
-| **HomePod** | `device_class: speaker` | ❌ | ❌ |
-| **Music Assistant** | `platform: music_assistant` in registry | ❌ | ✅ |
-| **Alexa / all others** | Everything else | ❌ | ❌ |
-
-Detection is automatic for most setups. If a Music Assistant speaker isn't being recognised, add its entity ID to `ma_entities` in your YAML config as a manual override.
-
----
-
-## ⚠️ Compatibility Notes
-
-### Older Alexa Devices
-
-Some older Echo models may not respond reliably to volume or mute commands via HA. This is a device limitation — not a card bug. Try routing volume to a separate entity using `volume_entity`.
-
-### Apple TV Volume
-
-Apple TV doesn't report its current volume level. The card looks back through recent history to find the last known level, and tracks any changes you make from that point. Volume buttons work correctly — they step the HomePod volume up or down as expected.
-
----
-
-## 🔧 Troubleshooting
-
-**Card doesn't appear after installation**
-- Add the resource to Lovelace (see Installation above) and hard-refresh: Ctrl+Shift+R / Cmd+Shift+R
-- If you're seeing stale updates after removing and re-adding the card, do a full dashboard reload
-
-**Volume errors on Apple TV or similar devices**
-- The card automatically skips volume commands that a device doesn't support. If you're still seeing errors, check that your HA and device integrations are up to date.
-
-**Remote button appears for wrong player**
-- Check `device_class: tv` is present on the entity; or ensure `apple tv` is in the entity ID or friendly name
-
-**Media info shows no results**
-- Music: ensure artist + title metadata is available from your media player
-- TV/Movies: add a TMDB v3 API key
-
-**Album artwork shows fallback icon**
-- The card automatically swaps broken artwork for the device icon — this is intentional
-- Ensure your media player reports the `entity_picture` attribute
-
-**Long press opens the iOS image menu instead of HA more info**
-- Update to the latest version — this is fixed in the current release
-
-**Drag-and-drop not working**
-- Entities must be checked before they can be reordered; on mobile use the ⠿ grip handle
-
----
-
-## 🙏 Credits & Acknowledgements
-
-### Music Assistant Library Browser
-The Music Assistant library browser includes code adapted from the work of **[jianyu-li](https://github.com/jianyu-li)**:
-
-> **📦 [yet-another-media-player](https://github.com/jianyu-li/yet-another-media-player)** by [@jianyu-li](https://github.com/jianyu-li)
-
-Many thanks for the excellent foundation on Music Assistant integration.
-
-### Special Thanks
-- The [Home Assistant](https://www.home-assistant.io) team
-- The HA community for inspiration and feedback
-- All users who test, report issues and suggest improvements
-
----
-
-## 📄 License
-
-MIT License — free to use, modify and distribute.
-
----
-
-## ⭐ Support
-
-If this card is useful to you, please **star the repository** and share it with the community!
-
-For bugs or feature requests, use the [GitHub Issues](../../issues) page.
+MIT — free to use, modify, and distribute.
