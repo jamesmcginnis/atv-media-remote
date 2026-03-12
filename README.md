@@ -2,7 +2,7 @@
 
 A sleek, Apple-inspired custom media player card for [Home Assistant](https://www.home-assistant.io/) with a built-in Apple TV remote control, smart volume handling, multi-device switching, and a fully visual editor. No YAML required.
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jamesmcginnis&repository=atv-media-remote&category=dashboard)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jamesmcginnis&repository=atv-media-remote&category=plugin)
 
 <p align="center">
   <img src="preview1.png" alt="Compact view" width="32%">
